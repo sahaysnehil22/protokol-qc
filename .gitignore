@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Databases
+*.db
+*.db-wal
+*.db-shm
+
+# Environments & Secrets
+.env
+.env.*
+
+# Flutter & Dart builds
+.dart_tool/
+build/
+.flutter-plugins*
+.packages
+
+# IDE & Editor metadata
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Uploads
+backend/data/uploads/*
+!backend/data/uploads/.gitkeep

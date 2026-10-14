@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protokol QC — Control de Calidad para Inmobiliarias y Constructoras</title>
+    <meta name="description" content="Software de control de calidad y protocolos de liberación en obra para constructoras e inmobiliarias del Perú (NTE E.060).">
+    
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app" class="app-layout">
+        <!-- Top Application Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="brand-container">
+                    <div class="brand-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <path d="m9 12 2 2 4-4"/>
+                        </svg>
+                    </div>
+                    <div class="brand-text">
+                        <span class="brand-title">Protokol QC</span>
+                        <span class="brand-tag">PERÚ • NTE E.060</span>
+                    </div>
+                </div>
+
+                <div class="project-selector-wrapper">
+                    <span class="selector-label">OBRA ACTIVA:</span>
+                    <select id="project-selector" class="project-dropdown" aria-label="Seleccionar Proyecto">
+                        <!-- Loaded dynamically -->
+                    </select>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <!-- System status badge -->
+                <div class="system-status-badge">
+                    <span class="status-dot"></span>
+                    <span class="status-label">Servidor en línea (Lima)</span>
+                </div>
+
+                <!-- User profile / role switcher -->
+                <div class="user-role-wrapper">
+                    <div class="user-info">
+                        <span id="user-display-name" class="user-name">Ing. Daniel Vargas</span>
+                        <span id="user-display-role" class="user-role">Especialista de Calidad</span>
+                    </div>
+                    <select id="role-switcher" class="role-dropdown" aria-label="Cambiar Rol Demo">
+                        <option value="calidad">Rol: Ing. Calidad</option>
+                        <option value="residente">Rol: Ing. Residente</option>
+                        <option value="contratista_estructuras">Rol: Contr. Estructuras</option>
+                        <option value="contratista_acabados">Rol: Contr. Acabados</option>
+                        <option value="ito">Rol: Supervisor ITO</option>
+                        <option value="admin">Rol: Administrador</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Navigation Tabs -->
+        <nav class="main-nav" aria-label="Navegación Principal">
+            <button class="nav-tab active" data-view="dashboard">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                Tablero Matutino (KPI)
+            </button>
+            <button class="nav-tab" data-view="inspections">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                Protocolos y Liberaciones
+            </button>
+            <button class="nav-tab" data-view="findings">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                Hallazgos (Snag List)
+                <span id="findings-counter-badge" class="nav-badge">0</span>
+            </button>
+            <button class="nav-tab" data-view="templates">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                Estudio de Plantillas
+            </button>
+        </nav>
+
+        <!-- Main Content Views Container -->
+        <main class="content-container">
+            <!-- VIEW 1: MORNING KPI DASHBOARD -->
+            <section id="view-dashboard" class="content-view active">
+                <div class="view-header">
+                    <div>
+                        <h1 class="view-title">Tablero Matutino de Obra</h1>
+                        <p class="view-subtitle">Métricas en tiempo real para jefes de calidad, residentes e inspectores técnicos (ITO).</p>
+                    </div>
+                    <div class="view-actions">
+                        <button id="btn-refresh-dashboard" class="btn btn-secondary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                            Actualizar Datos
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI Metric Cards Grid -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span class="kpi-label">TOTAL PROTOCOLOS</span>
+                            <span class="kpi-icon-pill icon-neutral">📋</span>
+                        </div>
+                        <div class="kpi-value" id="kpi-total-inspections">0</div>
+                        <div class="kpi-footer">Partidas registradas en obra</div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span class="kpi-label">TASA DE CONFORMIDAD</span>
+                            <span class="kpi-icon-pill icon-success">✓</span>
+                        </div>
+                        <div class="kpi-value text-success" id="kpi-pass-rate">0%</div>
+                        <div class="kpi-footer" id="kpi-conforme-detail">0 conformes a la primera</div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span class="kpi-label">BLOQUEOS DE VACIADO</span>
+                            <span class="kpi-icon-pill icon-danger">🚨</span>
+                        </div>
+                        <div class="kpi-value text-danger" id="kpi-pour-blockers">0</div>
+                        <div class="kpi-footer">No conformidades críticas en armadura/encofrado</div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span class="kpi-label">HALLAZGOS ABIERTOS</span>
+                            <span class="kpi-icon-pill icon-warning">⚠️</span>
+                        </div>
+                        <div class="kpi-value text-warning" id="kpi-open-findings">0</div>
+                        <div class="kpi-footer" id="kpi-overdue-detail">0 vencidos (&gt;48h)</div>
+                    </div>
+                </div>
+
+                <!-- Secondary Dashboard Widgets -->
+                <div class="dashboard-widgets-grid">
+                    <!-- Critical Pour Blockers Widget -->
+                    <div class="dashboard-panel">
+                        <div class="panel-header">
+                            <h2 class="panel-title">Estado de Liberación de Vaciados de Concreto</h2>
+                            <span class="panel-badge-info">NTE E.060</span>
+                        </div>
+                        <div class="panel-body" id="pour-blockers-container">
+                            <div class="empty-state">Cargando estado de partidas de concreto...</div>
+                        </div>
+                    </div>
+
+                    <!-- Contractor Accountability Widget -->
+                    <div class="dashboard-panel">
+                        <div class="panel-header">
+                            <h2 class="panel-title">Hallazgos Pendientes por Subcontratista</h2>
+                            <span class="panel-badge-info">Desempeño</span>
+                        </div>
+                        <div class="panel-body" id="contractor-stats-container">
+                            <div class="empty-state">Calculando balance por contratista...</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 2: INSPECTIONS & PROTOCOL VIEWER -->
+            <section id="view-inspections" class="content-view">
+                <div class="view-header">
+                    <div>
+                        <h1 class="view-title">Protocolos Oficiales de Liberación</h1>
+                        <p class="view-subtitle">Registros inmutables con tolerancias normativas, fotos de evidencia y firmas digitales.</p>
+                    </div>
+                    <div class="view-actions">
+                        <div class="filter-group">
+                            <input type="text" id="filter-inspections-search" class="input-search" placeholder="Buscar por código, partida...">
+                            <select id="filter-inspections-status" class="filter-dropdown">
+                                <option value="all">Todos los estados</option>
+                                <option value="conforme">Conforme</option>
+                                <option value="observado">Observado</option>
+                                <option value="borrador">Borrador</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inspections Data Table -->
+                <div class="table-card">
+                    <table class="data-table" id="inspections-table">
+                        <thead>
+                            <tr>
+                                <th>CÓDIGO</th>
+                                <th>PARTIDA / PLANTILLA</th>
+                                <th>UBICACIÓN EN OBRA</th>
+                                <th>FECHA VACIADO</th>
+                                <th>MIXER / LOTE</th>
+                                <th>ESTADO</th>
+                                <th>INSPECTOR</th>
+                                <th class="text-right">ACCIONES</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inspections-tbody">
+                            <tr><td colspan="8" class="text-center">Cargando protocolos...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- VIEW 3: FINDINGS (SNAG LIST) TRACKER -->
+            <section id="view-findings" class="content-view">
+                <div class="view-header">
+                    <div>
+                        <h1 class="view-title">Gestión de Hallazgos y No Conformidades</h1>
+                        <p class="view-subtitle">Aislamiento por contratista, carga obligatoria de evidencia fotográfica y verificación de calidad.</p>
+                    </div>
+                    <div class="view-actions">
+                        <div class="filter-group">
+                            <select id="filter-findings-status" class="filter-dropdown">
+                                <option value="all">Todos los estados</option>
+                                <option value="abierto">Abiertos</option>
+                                <option value="cerrado_con_evidencia">Subsanados (Pendiente verificación)</option>
+                                <option value="verificado">Verificados</option>
+                            </select>
+                            <select id="filter-findings-severity" class="filter-dropdown">
+                                <option value="all">Toda severidad</option>
+                                <option value="critico">Crítico</option>
+                                <option value="moderado">Moderado</option>
+                                <option value="leve">Leve</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Findings Table -->
+                <div class="table-card">
+                    <table class="data-table" id="findings-table">
+                        <thead>
+                            <tr>
+                                <th>CÓDIGO</th>
+                                <th>DESCRIPCIÓN DEL DEFECTO</th>
+                                <th>UBICACIÓN</th>
+                                <th>ESPECIALIDAD / CONTRATISTA</th>
+                                <th>SEVERIDAD</th>
+                                <th>FECHA LÍMITE</th>
+                                <th>ESTADO</th>
+                                <th class="text-right">ACCIONES</th>
+                            </tr>
+                        </thead>
+                        <tbody id="findings-tbody">
+                            <tr><td colspan="8" class="text-center">Cargando hallazgos...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- VIEW 4: TEMPLATE STUDIO -->
+            <section id="view-templates" class="content-view">
+                <div class="view-header">
+                    <div>
+                        <h1 class="view-title">Estudio de Plantillas y Bloques PDF</h1>
+                        <p class="view-subtitle">Estructure y configure el diseño oficial de sus actas y protocolos de calidad conforme a la normativa peruana.</p>
+                    </div>
+                </div>
+
+                <div class="template-studio-layout">
+                    <!-- Template List Panel -->
+                    <div class="studio-sidebar">
+                        <div class="panel-header">
+                            <h2 class="panel-title">Plantillas Estructurales</h2>
+                        </div>
+                        <div class="template-cards-list" id="studio-templates-list">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Template Block Customizer Panel -->
+                    <div class="studio-main">
+                        <div class="panel-header">
+                            <div>
+                                <h2 class="panel-title" id="studio-template-title">Seleccione una plantilla</h2>
+                                <span class="text-muted" id="studio-template-code">PROT-XXX</span>
+                            </div>
+                        </div>
+
+                        <div class="blocks-customizer-container">
+                            <p class="instruction-text">Configure qué bloques componen el acta oficial PDF y su orden de impresión:</p>
+
+                            <div class="blocks-list" id="studio-blocks-list">
+                                <div class="block-item active" data-block="header">
+                                    <div class="block-info">
+                                        <span class="block-drag-handle">☰</span>
+                                        <div>
+                                            <strong class="block-name">1. Membrete y Logotipo Institucional</strong>
+                                            <p class="block-desc">Razón social de constructora/inmobiliaria, código de protocolo y estado oficial.</p>
+                                        </div>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" checked disabled>
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+
+                                <div class="block-item active" data-block="project_meta">
+                                    <div class="block-info">
+                                        <span class="block-drag-handle">☰</span>
+                                        <div>
+                                            <strong class="block-name">2. Metadatos de Proyecto y Ubicación Jerárquica</strong>
+                                            <p class="block-desc">Nombre de obra, Torre &gt; Piso &gt; Elemento, Fecha de Vaciado, Guía de Remisión Mixer y Clima.</p>
+                                        </div>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" checked>
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+
+                                <div class="block-item active" data-block="items_table">
+                                    <div class="block-info">
+                                        <span class="block-drag-handle">☰</span>
+                                        <div>
+                                            <strong class="block-name">3. Tabla de Tolerancias Técnicas y Criterios</strong>
+                                            <p class="block-desc">Lista detallada de verificaciones según NTE E.060 (Slump, Recubrimiento, Probetas, Estribos).</p>
+                                        </div>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" checked disabled>
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+
+                                <div class="block-item active" data-block="findings_summary">
+                                    <div class="block-info">
+                                        <span class="block-drag-handle">☰</span>
+                                        <div>
+                                            <strong class="block-name">4. Resumen de No Conformidades y Hallazgos</strong>
+                                            <p class="block-desc">Detalle de observaciones generadas automáticamente para contratistas.</p>
+                                        </div>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" checked>
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+
+                                <div class="block-item active" data-block="signatures">
+                                    <div class="block-info">
+                                        <span class="block-drag-handle">☰</span>
+                                        <div>
+                                            <strong class="block-name">5. Cuadro de Firmas de Liberación</strong>
+                                            <p class="block-desc">Casillas oficiales para Ing. Calidad, Ing. Residente, Supervisor ITO y Contratista.</p>
+                                        </div>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" checked>
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+
+                                <div class="block-item active" data-block="footer_audit">
+                                    <div class="block-info">
+                                        <span class="block-drag-handle">☰</span>
+                                        <div>
+                                            <strong class="block-name">6. Pie de Página con Hash Criptográfico</strong>
+                                            <p class="block-desc">Trazabilidad inmutable de auditoría para entrega a inmobiliaria o municipalidad.</p>
+                                        </div>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" checked disabled>
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="studio-actions">
+                                <button id="btn-save-template-blocks" class="btn btn-primary">Guardar Configuración de Formato</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- MODAL: INSPECTION PROTOCOL DETAIL & PDF PREVIEW -->
+        <div id="modal-inspection" class="modal-backdrop">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-header">
+                    <div>
+                        <h2 class="modal-title" id="modal-insp-title">Protocolo de Inspección</h2>
+                        <span class="text-muted" id="modal-insp-subtitle">Detalle técnico</span>
+                    </div>
+                    <button class="btn-close" id="btn-close-insp-modal">&times;</button>
+                </div>
+                <div class="modal-body" id="modal-insp-body">
+                    <!-- Dynamic inspection answer cards -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="btn-modal-close">Cerrar</button>
+                    <a href="#" target="_blank" id="btn-modal-download-pdf" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Descargar Protocolo Oficial PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: FINDING SUBSANACIÓN & QUALITY VERIFICATION -->
+        <div id="modal-finding" class="modal-backdrop">
+            <div class="modal-dialog">
+                <div class="modal-header">
+                    <div>
+                        <h2 class="modal-title" id="modal-finding-title">Verificación de Hallazgo</h2>
+                        <span class="text-muted" id="modal-finding-code">HAL-XXXX</span>
+                    </div>
+                    <button class="btn-close" id="btn-close-finding-modal">&times;</button>
+                </div>
+                <div class="modal-body" id="modal-finding-body">
+                    <!-- Dynamic before / after comparison -->
+                </div>
+                <div class="modal-footer" id="modal-finding-footer">
+                    <!-- Dynamic Action Buttons -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Web Client Script -->
+    <script src="app.js"></script>
+</body>
+</html>
